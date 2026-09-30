@@ -1,3 +1,13 @@
+import 'dart:async';
+
+import '../../features/auth/data/datasources/auth_local_datasource.dart';
+import '../../features/auth/data/datasources/auth_remote_datasource.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/entities/auth_session.dart';
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/domain/usecases/login.dart';
+import '../../features/auth/domain/usecases/logout.dart';
+import '../../features/auth/domain/usecases/restore_session.dart';
 import '../../features/interventions/data/datasources/intervention_local_datasource.dart';
 import '../../features/interventions/data/datasources/intervention_remote_datasource.dart';
 import '../../features/interventions/data/datasources/sync_queue_local_datasource.dart';
@@ -21,6 +31,9 @@ class AppDependencies {
     required this.database,
     required this.syncEngine,
     required this.interventionRepository,
+    required this.authRepository,
+    required this.interventionLocal,
+    required this.sessionExpiredController,
   })  : getInterventions = GetInterventions(interventionRepository),
         getInterventionById = GetInterventionById(interventionRepository),
         createIntervention = CreateIntervention(interventionRepository),
@@ -28,12 +41,20 @@ class AppDependencies {
         addNote = AddNote(interventionRepository),
         addPhoto = AddPhoto(interventionRepository),
         saveSignature = SaveSignature(interventionRepository),
-        syncNow = SyncNow(interventionRepository);
+        syncNow = SyncNow(interventionRepository),
+        restoreSession = RestoreSession(authRepository),
+        _login = Login(authRepository),
+        _logout = Logout(authRepository);
 
   final AppDatabase database;
   final SyncEngine syncEngine;
   final InterventionRepository interventionRepository;
+  final AuthRepository authRepository;
 
+  final InterventionLocalDataSource interventionLocal;
+  final StreamController<void> sessionExpiredController;
+
+  // Interventions
   final GetInterventions getInterventions;
   final GetInterventionById getInterventionById;
   final CreateIntervention createIntervention;
@@ -43,14 +64,32 @@ class AppDependencies {
   final SaveSignature saveSignature;
   final SyncNow syncNow;
 
-  /// [database] et [baseUrl] permettent de tester (autre base, serveur factice).
+  // Authentification
+  final RestoreSession restoreSession;
+  final Login _login;
+  final Logout _logout;
+
+  /// Émet quand le serveur refuse le token :
+  /// l'UI doit revenir au login.
+  Stream<void> get sessionExpired =>
+      sessionExpiredController.stream;
+
+  /// [database], [baseUrl] et [authLocal] permettent de tester.
   static Future<AppDependencies> create({
     AppDatabase? database,
     String? baseUrl,
-    TokenProvider? tokenProvider,
+    AuthLocalDataSource? authLocal,
   }) async {
     final db = database ?? AppDatabase();
-    final dio = createDio(tokenProvider: tokenProvider, baseUrl: baseUrl);
+    final auth = authLocal ?? AuthLocalDataSource();
+    final expired = StreamController<void>.broadcast();
+
+    final dio = createDio(
+      baseUrl: baseUrl,
+      tokenProvider: auth.readToken,
+      onUnauthorized: () =>
+          unawaited(_handleUnauthorized(auth, expired)),
+    );
 
     final local = InterventionLocalDataSource(db);
     final queue = SyncQueueLocalDataSource(db);
@@ -61,11 +100,18 @@ class AppDependencies {
       remote: remote,
       queue: queue,
       connectivity: ConnectivityService(),
+      canSync: auth.hasSession,
     );
-    final repository = InterventionRepositoryImpl(
+
+    final interventionRepository = InterventionRepositoryImpl(
       local: local,
       queue: queue,
       syncEngine: engine,
+    );
+
+    final authRepository = AuthRepositoryImpl(
+      remote: AuthRemoteDataSource(dio),
+      local: auth,
     );
 
     await engine.start();
@@ -73,10 +119,58 @@ class AppDependencies {
     return AppDependencies._(
       database: db,
       syncEngine: engine,
-      interventionRepository: repository,
+      interventionRepository: interventionRepository,
+      authRepository: authRepository,
+      interventionLocal: local,
+      sessionExpiredController: expired,
     );
   }
 
-  /// Arrête la synchro (la base reste ouverte).
-  Future<void> dispose() => syncEngine.dispose();
+  static Future<void> _handleUnauthorized(
+    AuthLocalDataSource auth,
+    StreamController<void> expired,
+  ) async {
+    if (!await auth.hasSession()) return;
+
+    await auth.clear();
+
+    if (!expired.isClosed) {
+      expired.add(null);
+    }
+  }
+
+  /// Connexion, puis lancement de la synchro.
+  Future<AuthSession> signIn(
+    String email,
+    String password,
+  ) async {
+    final session = await _login(email, password);
+    syncEngine.requestSync();
+    return session;
+  }
+
+  /// Déconnexion : dernière tentative de synchro, puis session effacée.
+  ///
+  /// Les données locales ne sont supprimées que si tout est synchronisé.
+  /// Renvoie true si elles ont été supprimées, false si des actions en
+  /// attente les ont fait conserver.
+  Future<bool> signOut() async {
+    await syncEngine.sync();
+
+    final allSynced =
+        syncEngine.state.pendingCount == 0;
+
+    if (allSynced) {
+      await interventionLocal.deleteAll();
+    }
+
+    await _logout();
+
+    return allSynced;
+  }
+
+  Future<void> dispose() async {
+    await syncEngine.dispose();
+    await sessionExpiredController.close();
+  }
 }

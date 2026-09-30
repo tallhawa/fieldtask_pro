@@ -13,7 +13,7 @@ class AuthSessionModel {
     required this.token,
   });
 
-  /// Correspond à un objet de la collection "users" de db.json
+  /// Lit un utilisateur du serveur OU une session sauvegardée (même format).
   factory AuthSessionModel.fromJson(Map<String, dynamic> json) {
     return AuthSessionModel(
       userId: json['id'].toString(),
@@ -22,6 +22,14 @@ class AuthSessionModel {
       token: json['token'] as String,
     );
   }
+
+  /// Format sauvegardé dans le stockage sécurisé (jamais le mot de passe).
+  Map<String, dynamic> toJson() => {
+        'id': userId,
+        'name': name,
+        'email': email,
+        'token': token,
+      };
 
   AuthSession toEntity() {
     return AuthSession(
