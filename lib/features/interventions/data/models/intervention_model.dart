@@ -111,4 +111,50 @@ class InterventionModel {
       'sync_status': syncStatus,
     };
   }
+
+  /// JSON du serveur -> modèle
+  /// Le serveur ne connaît pas sync_status.
+  factory InterventionModel.fromJson(Map<String, dynamic> json) {
+    return InterventionModel(
+      id: json['id'].toString(),
+      title: json['title'] as String,
+      clientName: json['clientName'] as String,
+      address: json['address'] as String,
+      description: json['description'] as String,
+      equipment: json['equipment'] as String,
+      status: json['status'] as String,
+      priority: json['priority'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      scheduledAt: json['scheduledAt'] as String,
+      notes: (json['notes'] as String?) ?? '',
+      photoPaths: List<String>.from(
+        json['photoPaths'] as List? ?? const [],
+      ),
+      signaturePath: json['signaturePath'] as String?,
+      updatedAt: json['updatedAt'] as String,
+    );
+  }
+
+  /// Modèle -> JSON envoyé au serveur
+  /// sync_status reste local et n'est pas envoyé au serveur.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'clientName': clientName,
+      'address': address,
+      'description': description,
+      'equipment': equipment,
+      'status': status,
+      'priority': priority,
+      'latitude': latitude,
+      'longitude': longitude,
+      'scheduledAt': scheduledAt,
+      'notes': notes,
+      'photoPaths': photoPaths,
+      'signaturePath': signaturePath,
+      'updatedAt': updatedAt,
+    };
+  }
 }

@@ -9,17 +9,18 @@ class AppDatabase {
   static const int _dbVersion = 1;
 
   /// [path] sert uniquement aux tests (ex. inMemoryDatabasePath).
-  AppDatabase({String? path}) : _path = path;
+  AppDatabase({this.path});
 
-  final String? _path;
+  final String? path;
   Database? _db;
 
   Future<Database> get database async => _db ??= await _open();
 
   Future<Database> _open() async {
-    final path = _path ?? join(await getDatabasesPath(), _dbName);
+    final dbPath = path ?? join(await getDatabasesPath(), _dbName);
+
     return openDatabase(
-      path,
+      dbPath,
       version: _dbVersion,
       onCreate: _onCreate,
     );
@@ -48,7 +49,8 @@ class AppDatabase {
     ''');
 
     await db.execute(
-      'CREATE INDEX idx_interventions_status ON $tableInterventions(status)',
+      'CREATE INDEX idx_interventions_status '
+      'ON $tableInterventions(status)',
     );
 
     await db.execute('''
