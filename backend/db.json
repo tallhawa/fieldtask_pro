@@ -1,0 +1,64 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Technicien Test",
+      "email": "tech@techfix.sn",
+      "password": "1234",
+      "token": "jwt-simule-abc123"
+    }
+  ],
+  "interventions": [
+    {
+      "id": "i1",
+      "title": "Panne routeur",
+      "clientName": "Société Sonatel Agence",
+      "address": "Avenue Cheikh Anta Diop, Dakar",
+      "description": "Routeur principal hors service",
+      "equipment": "Routeur Cisco 2900",
+      "status": "pending",
+      "priority": "high",
+      "latitude": 14.6928,
+      "longitude": -17.4467,
+      "scheduledAt": "2026-10-01T09:00:00.000Z",
+      "notes": "",
+      "photoPaths": [],
+      "signaturePath": null,
+      "updatedAt": "2026-09-29T08:00:00.000Z"
+    },
+    {
+      "id": "i2",
+      "title": "Maintenance climatisation",
+      "clientName": "Usine Textile Thiès",
+      "address": "Zone industrielle, Thiès",
+      "description": "Contrôle annuel du système de refroidissement",
+      "equipment": "Climatiseur industriel",
+      "status": "inProgress",
+      "priority": "medium",
+      "latitude": 14.7910,
+      "longitude": -16.9359,
+      "scheduledAt": "2026-10-02T14:00:00.000Z",
+      "notes": "",
+      "photoPaths": [],
+      "signaturePath": null,
+      "updatedAt": "2026-09-29T08:00:00.000Z"
+    },
+    {
+      "id": "i3",
+      "title": "Remplacement antenne",
+      "clientName": "Tour Télécom Rufisque",
+      "address": "Rufisque",
+      "description": "Antenne 4G endommagée",
+      "equipment": "Antenne sectorielle",
+      "status": "done",
+      "priority": "low",
+      "latitude": 14.7167,
+      "longitude": -17.2667,
+      "scheduledAt": "2026-09-28T10:00:00.000Z",
+      "notes": "Remplacée avec succès",
+      "photoPaths": [],
+      "signaturePath": null,
+      "updatedAt": "2026-09-28T12:00:00.000Z"
+    }
+  ]
+}
