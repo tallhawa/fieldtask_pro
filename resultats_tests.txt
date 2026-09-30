@@ -1,0 +1,23 @@
+﻿00:00 +0: loading C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart
+00:00 +0: C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart: un d├®lai d├®pass├® devient NetworkException
+00:00 +1: C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart: une connexion impossible devient NetworkException
+00:00 +2: C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart: HTTP 404 devient NotFoundException
+00:00 +3: C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart: HTTP 401 devient AuthException
+00:00 +4: C:/Users/madit/Documents/fieldtask_pro/test/core/dio_error_mapper_test.dart: HTTP 500 devient ServerException avec son code
+00:00 +5: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_mapper_test.dart: toModel convertit les ├®num├®rations en texte
+00:00 +6: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_mapper_test.dart: toModel applique le statut de synchro demand├® (synced par d├®faut)
+00:00 +7: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_mapper_test.dart: aller-retour Entity -> Model -> Entity sans perte
+00:00 +8: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: updateStatus : SQLite passe en pending et une action est empil├®e
+00:01 +9: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: createIntervention : ligne pending et action ┬½ create ┬╗
+00:01 +10: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: deux modifications donnent deux actions dans l'ordre (FIFO)
+00:01 +11: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: addPhoto conserve les photos dans l'ordre de prise
+00:01 +12: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: modifier une intervention inconnue l├¿ve NotFoundException
+00:01 +13: C:/Users/madit/Documents/fieldtask_pro/test/data/intervention_repository_impl_test.dart: getInterventions ne lance une synchro que si la base locale est vide
+00:01 +14: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: GetInterventions renvoie la liste du repository
+00:01 +15: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: GetInterventions renvoie la liste du repository
+00:01 +16: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: GetInterventionById renvoie l'intervention, ou null si inconnue
+00:01 +17: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: les use cases d'├®criture d├®l├¿guent au repository
+00:01 +18: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: Login renvoie la session du repository
+00:01 +19: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: RestoreSession renvoie null quand personne n'est connect├®
+00:01 +20: C:/Users/madit/Documents/fieldtask_pro/test/domain/usecases_test.dart: Logout d├®l├¿gue au repository
+00:01 +21: All tests passed!
