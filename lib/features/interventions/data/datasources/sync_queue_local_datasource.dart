@@ -40,6 +40,16 @@ class SyncQueueLocalDataSource {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
+  /// Combien d'actions en attente pour cette intervention ?
+  Future<int> countForIntervention(String interventionId) async {
+    final db = await _appDb.database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) FROM $_table WHERE intervention_id = ?',
+      [interventionId],
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   Future<void> clear() async {
     final db = await _appDb.database;
     await db.delete(_table);
